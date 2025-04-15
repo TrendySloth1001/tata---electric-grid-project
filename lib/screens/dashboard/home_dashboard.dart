@@ -363,18 +363,10 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
     return Card(
       margin: EdgeInsets.zero,
       color: AppTheme.cardColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: AppTheme.darkSecondaryColor.withOpacity(0.3),
-          width: 1.5,
-        ),
-      ),
+      shape: AppTheme.standardCardTheme.shape,
       child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+        decoration: AppTheme.cardDecoration.copyWith(
           color: AppTheme.backgroundColor,
-          border: Border.all(color: Colors.transparent),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -418,88 +410,55 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
   }
 
   Widget _buildUsageCard() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppTheme.cardGradientStart.withOpacity(0.3),
-            AppTheme.cardGradientEnd.withOpacity(0.3),
-          ],
+    return Card(
+      margin: EdgeInsets.zero,
+      color: AppTheme.cardColor,
+      shape: AppTheme.standardCardTheme.shape,
+      child: Container(
+        decoration: AppTheme.cardDecoration.copyWith(
+          color: AppTheme.backgroundColor,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.cardGradientStart.withOpacity(0.1),
-            blurRadius: 8,
-            spreadRadius: 2,
-          ),
-          BoxShadow(
-            color: AppTheme.cardGradientEnd.withOpacity(0.1),
-            blurRadius: 8,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: Card(
-        margin: EdgeInsets.zero,
-        color: AppTheme.cardColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(
-            color: AppTheme.darkSecondaryColor.withOpacity(0.3),
-            width: 1.5,
-          ),
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: AppTheme.backgroundColor,
-            border: Border.all(color: Colors.transparent),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Real-time Energy Usage',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '${_currentFlow.toStringAsFixed(1)} kW',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: AppTheme.darkSecondaryColor,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Real-time Energy Usage',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.fullscreen),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${_currentFlow.toStringAsFixed(1)} kW',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: AppTheme.darkSecondaryColor,
-                      onPressed: () => _showFullScreenGraph(context, 'Usage'),
+                      fontWeight: FontWeight.bold,
                     ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  height: 250,
-                  child: LineChart(_createChartData()),
-                ),
-                const SizedBox(height: 16),
-                _buildUsageStats(),
-              ],
-            ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.fullscreen),
+                    color: AppTheme.darkSecondaryColor,
+                    onPressed: () => _showFullScreenGraph(context, 'Usage'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                height: 250,
+                child: LineChart(_createChartData()),
+              ),
+              const SizedBox(height: 16),
+              _buildUsageStats(),
+            ],
           ),
         ),
       ),
@@ -758,15 +717,7 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
           isCurved: true,
           color: AppTheme.warningYellow,
           barWidth: 3,
-          dotData: FlDotData(
-            show: true,
-            getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
-              radius: 6,
-              color: AppTheme.warningYellow,
-              strokeWidth: 2,
-              strokeColor: AppTheme.backgroundColor,
-            ),
-          ),
+          dotData: FlDotData(show: false), // Changed to hide dots
           belowBarData: BarAreaData(
             show: true,
             color: AppTheme.warningYellow.withOpacity(0.1),

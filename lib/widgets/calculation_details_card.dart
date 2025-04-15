@@ -22,63 +22,62 @@ class CalculationDetailsCard extends StatelessWidget {
     return Card(
       margin: EdgeInsets.zero,
       color: AppTheme.cardColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: AppTheme.darkSecondaryColor.withOpacity(0.3),
-          width: 1.5,
+      shape: AppTheme.standardCardTheme.shape,
+      child: Container(
+        decoration: AppTheme.cardDecoration.copyWith(
+          color: AppTheme.backgroundColor,
         ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Bill Details',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Bill Details',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            
-            // Slab Breakdown
-            ...slabBreakdown.map((slab) => _buildSlabRow(
-              '${slab['from']}-${slab['to']} units @ ₹${slab['rate'].toStringAsFixed(2)}',
-              slab['amount'].toDouble(),
-            )),
-            
-            const Divider(color: Colors.white24),
-            _buildDetailRow(
-              'Energy Charges',
-              IndianFormatter.formatCurrency(bill['energyCharges']!),
-            ),
-            _buildDetailRow(
-              'Fixed Charges',
-              IndianFormatter.formatCurrency(bill['fixedCharge']!),
-            ),
-            _buildDetailRow(
-              'Fuel Adjustment',
-              IndianFormatter.formatCurrency(bill['fuelAdjustment']!),
-            ),
-            _buildDetailRow(
-              'Electricity Duty',
-              IndianFormatter.formatCurrency(bill['electricityDuty']!),
-            ),
-            _buildDetailRow(
-              'Tax',
-              IndianFormatter.formatCurrency(bill['tax']!),
-            ),
-            const Divider(color: Colors.white24),
-            _buildDetailRow(
-              'Total Amount',
-              IndianFormatter.formatCurrency(bill['total']!),
-              isTotal: true,
-            ),
-            const SizedBox(height: 8),
-            _buildSavingsTips(bill['total']!),
-          ],
+              const SizedBox(height: 16),
+              
+              // Slab Breakdown
+              ...slabBreakdown.map((slab) => _buildSlabRow(
+                '${slab['from']}-${slab['to']} units @ ₹${slab['rate'].toStringAsFixed(2)}',
+                slab['amount'].toDouble(),
+              )),
+              
+              const Divider(color: Colors.white24),
+              _buildDetailRow(
+                'Energy Charges',
+                IndianFormatter.formatCurrency(bill['energyCharges']!),
+              ),
+              _buildDetailRow(
+                'Fixed Charges',
+                IndianFormatter.formatCurrency(bill['fixedCharge']!),
+              ),
+              _buildDetailRow(
+                'Fuel Adjustment',
+                IndianFormatter.formatCurrency(bill['fuelAdjustment']!),
+              ),
+              _buildDetailRow(
+                'Electricity Duty',
+                IndianFormatter.formatCurrency(bill['electricityDuty']!),
+              ),
+              _buildDetailRow(
+                'Tax',
+                IndianFormatter.formatCurrency(bill['tax']!),
+              ),
+              const Divider(color: Colors.white24),
+              _buildDetailRow(
+                'Total Amount',
+                IndianFormatter.formatCurrency(bill['total']!),
+                isTotal: true,
+              ),
+              const SizedBox(height: 8),
+              _buildSavingsTips(bill['total']!),
+            ],
+          ),
         ),
       ),
     );

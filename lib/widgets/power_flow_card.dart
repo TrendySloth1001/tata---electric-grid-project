@@ -24,57 +24,55 @@ class PowerFlowCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Card(
-      elevation: 0,
-      margin: EdgeInsets.zero, // Remove card margin
+      margin: EdgeInsets.zero,
       color: AppTheme.cardColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: AppTheme.darkPrimaryColor.withOpacity(0.2),
-          width: 1,
+      shape: AppTheme.standardCardTheme.shape,
+      child: Container(
+        decoration: AppTheme.cardDecoration.copyWith(
+          color: AppTheme.backgroundColor,
         ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Live Power Flow',
-                  style: textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: direction == PowerDirection.incoming
-                        ? AppTheme.darkSecondaryColor.withOpacity(0.2)
-                        : AppTheme.warningYellow.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    direction == PowerDirection.incoming ? 'Incoming' : 'Outgoing',
-                    style: textTheme.labelMedium?.copyWith(
-                      color: direction == PowerDirection.incoming
-                          ? AppTheme.darkSecondaryColor
-                          : AppTheme.warningYellow,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Live Power Flow',
+                    style: textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Center(
-              child: _buildFlowIndicator(),
-            ),
-            const SizedBox(height: 16),
-            _buildStabilityBar(context),
-          ],
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: direction == PowerDirection.incoming
+                          ? AppTheme.darkSecondaryColor.withOpacity(0.2)
+                          : AppTheme.warningYellow.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      direction == PowerDirection.incoming ? 'Incoming' : 'Outgoing',
+                      style: textTheme.labelMedium?.copyWith(
+                        color: direction == PowerDirection.incoming
+                            ? AppTheme.darkSecondaryColor
+                            : AppTheme.warningYellow,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Center(
+                child: _buildFlowIndicator(),
+              ),
+              const SizedBox(height: 16),
+              _buildStabilityBar(context),
+            ],
+          ),
         ),
       ),
     );

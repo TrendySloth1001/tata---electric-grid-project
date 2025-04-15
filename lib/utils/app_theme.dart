@@ -9,12 +9,12 @@ class AppTheme {
   static const darkPrimaryColor = Color(0xFF1565C0);
   static const darkSecondaryColor = Color(0xFF00E676);
   static const backgroundColor = Color(0xFF000000); // Pure black
-  static const surfaceColor = Color(0xFF000000); // Changed to pure black
-  static const cardColor = Color(0xFF000000); // Changed to pure black
+  static const surfaceColor = Color(0xFF000000); // Pure black
+  static const cardColor = Color(0xFF000000); // Pure black
   
   static const cardGradientStart = Color(0xFF1565C0);
   static const cardGradientEnd = Color(0xFF00E676);
-  static const chartBackgroundColor = Color(0xFF0A0A0A);
+  static const chartBackgroundColor = Color(0xFF000000); // Pure black
   
   // Indian currency symbol and formatting
   static const rupeesSymbol = '₹';
@@ -110,8 +110,30 @@ class AppTheme {
       ),
     ),
     dialogTheme: DialogTheme(
-      backgroundColor: surfaceColor,
+      backgroundColor: backgroundColor,
       elevation: 0,
+    ),
+  );
+
+  static BoxDecoration get cardDecoration => BoxDecoration(
+    borderRadius: BorderRadius.circular(16),
+    color: backgroundColor,
+    border: Border.all(
+      color: darkSecondaryColor.withOpacity(0.3),
+      width: 1.5,
+    ),
+  );
+
+  static CardTheme get standardCardTheme => CardTheme(
+    elevation: 0,
+    color: backgroundColor,
+    margin: EdgeInsets.zero,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16),
+      side: BorderSide(
+        color: darkSecondaryColor.withOpacity(0.3),
+        width: 1.5,
+      ),
     ),
   );
 }
