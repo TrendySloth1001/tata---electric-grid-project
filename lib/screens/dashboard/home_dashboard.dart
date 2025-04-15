@@ -11,6 +11,7 @@ import '../../widgets/power_flow_card.dart';
 import 'package:intl/intl.dart';
 import '../../widgets/calculation_details_card.dart';
 import '../../utils/indian_formatter.dart';
+import '../../services/storage_service.dart';
 
 class HomeDashboard extends StatefulWidget {
   const HomeDashboard({super.key});
@@ -27,6 +28,7 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
   final PredictionService _predictionService = PredictionService();
   final WeatherService _weatherService = WeatherService();
   final GamificationService _gamificationService = GamificationService();
+  final StorageService _storageService = StorageService();
   List<double> _predictions = [];
   WeatherData? _weatherData;
   Timer? _updateTimer;
@@ -67,7 +69,7 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
     _loadData();
     _startRealtimeUpdates();
     _startPowerFlowUpdates();
-    _generateCostPredictions();
+    _loadStoredData();
   }
 
   Future<void> _loadData() async {
@@ -153,10 +155,27 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
     return _currentFlow * hoursInMonth;
   }
 
-  void _generateCostPredictions() {
+  Future<void> _loadStoredData() async {
+    try {
+      final storedPredictions = await _storageService.getCostPredictions();
+      if (storedPredictions.isNotEmpty) {
+        setState(() {
+          _costPredictions.clear();
+          _costPredictions.addAll(storedPredictions);
+        });
+      } else {
+        _generateCostPredictions();
+      }
+    } catch (e) {
+      debugPrint('Error loading stored data: $e');
+    }
+  }
+
+  void _generateCostPredictions() async {
     final random = math.Random();
     _costPredictions.clear();
     
+    // Ensure we generate exactly 24 predictions
     for (int i = 0; i < 24; i++) {
       double baseRate = 1.0; // Base rate ₹1/kW
       
@@ -167,6 +186,11 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
       
       // Add small random variation (±₹0.2)
       _costPredictions.add(baseRate + (random.nextDouble() * 0.4 - 0.2));
+    }
+    
+    // Save predictions only if we have all 24 hours
+    if (_costPredictions.length == 24) {
+      await _storageService.saveCostPredictions(_costPredictions);
     }
   }
 
@@ -205,6 +229,22 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
       spots.add(FlSpot(i.toDouble(), value));
     }
     return spots;
+  }
+
+  Future<void> _saveCalculation() async {
+    final calculation = {
+      'timestamp': DateTime.now().toIso8601String(),
+      'currentFlow': _currentFlow,
+      'cost': _calculateCurrentRate() * _currentFlow,
+      'direction': _flowDirection.toString(),
+    };
+    
+    await _storageService.saveCalculation(calculation);
+  }
+
+  void _viewCalculationHistory() async {
+    final calculations = await _storageService.getCalculations();
+    // Show history in dialog/screen
   }
 
   @override
@@ -506,8 +546,17 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
   }
 
   Widget _buildCostBreakdown() {
-    final currentHourCost = _costPredictions[DateTime.now().hour];
-    final avgCost = _costPredictions.reduce((a, b) => a + b) / _costPredictions.length;
+    final now = DateTime.now();
+    final currentHour = now.hour;
+    
+    // Add bounds checking for cost predictions
+    double currentHourCost = 0.0;
+    double avgCost = 0.0;
+    
+    if (_costPredictions.isNotEmpty) {
+      currentHourCost = _costPredictions[currentHour % _costPredictions.length];
+      avgCost = _costPredictions.reduce((a, b) => a + b) / _costPredictions.length;
+    }
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -530,10 +579,12 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
   }
 
   int _findOptimalUsageTime() {
-    int optimalHour = 0;
-    double lowestCost = double.infinity;
+    if (_costPredictions.isEmpty) return 0;
     
-    for (int i = 0; i < _costPredictions.length; i++) {
+    int optimalHour = 0;
+    double lowestCost = _costPredictions[0];
+    
+    for (int i = 1; i < _costPredictions.length; i++) {
       if (_costPredictions[i] < lowestCost) {
         lowestCost = _costPredictions[i];
         optimalHour = i;
@@ -808,13 +859,13 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'Monthly Allocation: 150 kW',
+          'Monthly Allocation: 200 kW',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
           ),
         ),
         Text(
-          'Available: ${(150 - _currentFlow).toStringAsFixed(1)} kW',
+          'Available: ${(200 - _currentFlow).toStringAsFixed(1)} kW',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: AppTheme.darkSecondaryColor,
           ),

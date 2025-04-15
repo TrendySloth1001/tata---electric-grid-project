@@ -1,23 +1,40 @@
 import 'package:flutter/material.dart';
 import '../utils/app_theme.dart';
 import '../utils/indian_formatter.dart';
+import '../services/storage_service.dart';
 
 class CalculationDetailsCard extends StatelessWidget {
   final double consumedUnits;
   final double ratePerUnit;
   final double hours;
+  final StorageService _storageService = StorageService();
 
-  const CalculationDetailsCard({
+   CalculationDetailsCard({
     super.key,
     required this.consumedUnits,
     required this.ratePerUnit,
     required this.hours,
   });
 
+  Future<void> _saveCalculation(double total) async {
+    final calculation = {
+      'timestamp': DateTime.now().toIso8601String(),
+      'units': consumedUnits,
+      'rate': ratePerUnit,
+      'hours': hours,
+      'total': total,
+    };
+    
+    await _storageService.saveCalculation(calculation);
+  }
+
   @override
   Widget build(BuildContext context) {
     final bill = MumbaiTariffCalculator.calculateDetailedBill(consumedUnits);
     final slabBreakdown = MumbaiTariffCalculator.getSlabBreakdown(consumedUnits);
+
+    // Save calculation when widget is built
+    _saveCalculation(bill['total']!);
 
     return Card(
       margin: EdgeInsets.zero,
