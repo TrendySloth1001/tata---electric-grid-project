@@ -3,6 +3,7 @@ import 'screens/auth/login_screen.dart';
 import 'utils/app_theme.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -11,12 +12,62 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Create default theme data
+    final defaultTheme = AppTheme.darkTheme;
+    
     return MaterialApp(
       title: 'Tata Smart Grid',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.dark, // Force dark theme
+      debugShowCheckedModeBanner: false,
+      theme: defaultTheme.copyWith(
+        colorScheme: ColorScheme.dark(
+          primary: AppTheme.darkPrimaryColor,
+          secondary: AppTheme.darkSecondaryColor,
+          background: AppTheme.backgroundColor,
+          surface: AppTheme.surfaceColor,
+          onSurface: Colors.white,
+          onBackground: Colors.white,
+        ),
+        scaffoldBackgroundColor: AppTheme.backgroundColor,
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor: AppTheme.backgroundColor,
+          selectedItemColor: AppTheme.darkSecondaryColor,
+          unselectedItemColor: Colors.white.withOpacity(0.5),
+        ),
+        // Add dialog theme
+        dialogTheme: DialogTheme(
+          backgroundColor: AppTheme.backgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: AppTheme.darkSecondaryColor.withOpacity(0.3),
+            ),
+          ),
+        ),
+      ),
+      darkTheme: defaultTheme,
+      themeMode: ThemeMode.dark,
       home: const LoginScreen(),
+      builder: (context, child) {
+        // Add error boundary
+        ErrorWidget.builder = (FlutterErrorDetails details) {
+          return Material(
+            child: Container(
+              color: AppTheme.backgroundColor,
+              child: Center(
+                child: Text(
+                  'An error occurred.\nPlease restart the app.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppTheme.warningYellow,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+          );
+        };
+        return child ?? const SizedBox.shrink();
+      },
     );
   }
 }
